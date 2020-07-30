@@ -11,74 +11,8 @@ body {
     justify-content: center;
 }
 
-.project_selector, .workflow_selector {
-    display: flex;
-}
-
-.project_select_option, .workflow_select_option {
-    border: none;
-    background: #404040;
-    color: #ffffff !important;
-    font-weight: 100;
-    padding: 10px 20px;
-    margin: 0 10px 0 10px;
-    border-radius: 6px;
-    display: inline-block;
-    transition: all 0.3s ease 0s;
-    cursor: pointer;
-}
-
-.project_select_option_selected, .workflow_select_option_selected {
-    color: #404040 !important;
-    font-weight: 700 !important;
-    letter-spacing: 3px;
-    background: none;
-    -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-    -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-    transition: all 0.3s ease 0s;
-}
-
-.save_button_wrapper {
-    display: flex;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.saveButton {
-    border: none;
-    background: #0085FF;
-    color: #ffffff !important;
-    font-weight: 100;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 6px;
-    display: inline-block;
-    transition: all 0.3s ease 0s;
-    cursor: pointer;
-}
-
-.saveButton:hover {
-    transform: scale(1.05);
-}
-
-.saveButton:disabled {
-    filter: blur(1px);
-}
-
-.previousButton {
-    border: none;
-    background-color: white;
-    color: #0085FF !important;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 6px;
-    display: inline-block;
-    transition: all 0.3s ease 0s;
-    cursor: pointer;
-}
-
 .error_message_wrapper {
+    overflow: hidden;
     background: #fff;
     border-radius: 2px;
     display: inline-block;
@@ -88,7 +22,6 @@ body {
     width: 300px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-    overflow: hidden;
     cursor: default;
 }
 
@@ -112,20 +45,37 @@ body {
     height: 100%;
 }
 
-.error_explanation {
+.status_badge_title {
+    font-weight: bold;
+    font-size: 30px;
+    margin: 20px 0 0 0;
+}
+
+.status_badge_subtitle {
+    margin: 0 0 20px 0;
+    font-size: 20px;
 }
 
 .status_badge_wrapper {
+    position: relative;
+    display: inline-block;
     display: flex;
+    height: 50px;
+    width: 100px;
     padding: 0 20px;
+    margin: 0 auto;
     border-radius: 5px;
     background-color: grey;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    transition: all 0.5s cubic-bezier(.25,.8,.25,1);
 }
 
-.status_badge_wrapper:hover {
+.Tilt:hover .status_badge_wrapper {
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.Tilt:hover .Tilt-inner {
+    transform: translateZ(30px);
 }
 
 .status_badge_icon {
@@ -147,8 +97,31 @@ body {
 }
 
 .status_badge_text {
-    margin-left: 20px;
     color: white;
     text-transform: uppercase;
     font-weight: bold;
+    font-size: 17px;
+    margin: auto auto auto 20px;
+}
+
+.Tilt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 27px rgba(0, 0, 0, 0.05);
+    transform-style: preserve-3d;
+}
+
+.Tilt-status {
+    background: #fff;
+    border-radius: 2px;
+    display: inline-block;
+    height: 150px;
+    width: 200px;
+    padding: 0 15px 15px 15px;
+    position: relative;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    text-align: center;
+    cursor: default;
 }

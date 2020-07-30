@@ -171,14 +171,14 @@ class App extends React.Component {
 
 class ErrorMessage extends React.Component {
     render() {
-        return <Tilt className="Tilt" options={{ max: 20 }}>
+        return <Tilt className="Tilt Tilt-error" options={{ max: 20 }}>
             <ReactCardFlip isFlipped={this.props.errorFlipped && this.props.explanation.length > 0}>
-            <div onClick={this.props.flipCard} className="Tilt-inner error_message_wrapper">
+            <div onClick={this.props.flipCard} className="error_message_wrapper">
             <p className="error_message_title">Error</p>
             <p className="error_message_message">{this.props.message}</p>
             <img alt="Error" className="error_message_exclamation_mark" src="/exclamation_mark.png" />
             </div>
-            <div onClick={this.props.flipCard} className="Tilt-inner error_message_wrapper">
+            <div onClick={this.props.flipCard} className="error_message_wrapper">
             <p className="error_explanation">{this.props.explanation}</p>
             </div>
             </ReactCardFlip>
@@ -245,14 +245,20 @@ class StatusBadge extends React.Component {
         if(this.state.errorMessageEnabled) {
             return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard}/></div>;
         } else {
-            return <div className="App"><Badge status={this.state.status} /></div>;
+            return <div className="App"><Badge project={this.props.settings.project_name} workflow={this.props.settings.workflow_name} status={this.state.status} /></div>;
         }
     }
 }
 
 class Badge extends React.Component {
     render() {
-        return <Tilt className="Tilt"><div className={"status_badge_wrapper status_" + this.props.status}><div className="status_badge_icon"><MaterialIcon icon={badgeIcons[this.props.status]} color="#FFF" /></div><p className="status_badge_text">{this.props.status}</p></div></Tilt>;
+        return <Tilt className="Tilt Tilt-status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
+            <p className="status_badge_title">{this.props.project}</p>
+            <p className="status_badge_subtitle">{this.props.workflow}</p>
+            <div className={"Tilt-inner status_badge_wrapper status_" + this.props.status}>
+            <div className="status_badge_icon"><MaterialIcon icon={badgeIcons[this.props.status]} color="#FFF" /></div><p className="status_badge_text">{this.props.status}</p>
+            </div>
+            </Tilt>;
     }
 }
 
