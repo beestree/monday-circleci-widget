@@ -13,7 +13,7 @@ body {
 
 .error_message_wrapper {
     overflow: hidden;
-    background: #fff;
+    background-color: #fff;
     border-radius: 2px;
     display: inline-block;
     height: 150px;
@@ -58,7 +58,6 @@ body {
 
 .status_badge_wrapper {
     position: relative;
-    display: inline-block;
     display: flex;
     height: 50px;
     width: 100px;
@@ -112,8 +111,11 @@ body {
     transform-style: preserve-3d;
 }
 
-.Tilt-status {
-    background: #fff;
+.Tilt:hover {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.Tilt_status {
     border-radius: 2px;
     display: inline-block;
     height: 150px;
@@ -124,4 +126,42 @@ body {
     transition: all 0.3s cubic-bezier(.25,.8,.25,1);
     text-align: center;
     cursor: default;
+}
+
+
+
+
+/* Dark mode additions */
+
+.dark_mode .error_message_wrapper {
+    background-color: #121212;
+}
+
+.dark_mode .error_message_title {
+    color: white;
+    opacity: 87%;
+}
+
+.dark_mode .error_message_message {
+    color: white;
+    opacity: 87%;
+}
+
+.dark_mode .error_explanation {
+    color: white;
+    opacity: 87%;
+}
+
+.dark_mode .status_badge_title {
+    color: white;
+    opacity: 87%;
+}
+
+.dark_mode .status_badge_subtitle {
+    color: white;
+    opacity: 87%;
+}
+
+.dark_mode .Tilt_status {
+    background-color: #121212;
 }

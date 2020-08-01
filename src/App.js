@@ -22,12 +22,6 @@ const possibleErrors = {
     "Organization not found": "Organization not found. Please check your organization name."
 };
 
-const badgeIcons = {
-    canceled: "remove_circle_outline",
-    failed: "error_outline",
-    success: "check_circle_outline"
-};
-
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -39,7 +33,8 @@ class App extends React.Component {
             errorMessage: "",
             errorExplanation: "",
             projects: {},
-            errorFlipped: false
+            errorFlipped: false,
+            theme: "light"
         };
 
         this.flipCard = this.flipCard.bind(this);
@@ -54,6 +49,16 @@ class App extends React.Component {
         monday.listen("settings", res => {
             this.setState({settings: res.data});
         });
+        monday.listen("context", res => {
+            this.setState({theme: res.data.theme});
+        });
+        //this.interval = setInterval(() => {
+        //    if(this.state.theme === "light") {
+        //        this.setState({ theme: "dark" });
+        //    } else {
+        //        this.setState({ theme: "light" });
+        //    }
+        //}, 1000);
     }
 
     flipCard(e) {
@@ -162,16 +167,16 @@ class App extends React.Component {
 
     render() {
         if(this.state.errorMessageEnabled) {
-            return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard}/></div>;
+            return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard} theme={this.state.theme}/></div>;
         } else {
-            return <div className="app"><StatusBadge settings={this.state.settings} projects={this.state.projects} /></div>;
+            return <div className="app"><StatusBadge settings={this.state.settings} projects={this.state.projects} theme={this.state.theme} /></div>;
         }
     };
 }
 
 class ErrorMessage extends React.Component {
     render() {
-        return <Tilt className="Tilt Tilt-error" options={{ max: 20 }}>
+        return <Tilt className={"Tilt-error " + (this.props.theme === "dark" ? "dark_mode" : "")} options={{ max: 20 }}>
             <ReactCardFlip isFlipped={this.props.errorFlipped && this.props.explanation.length > 0}>
             <div onClick={this.props.flipCard} className="error_message_wrapper">
             <p className="error_message_title">Error</p>
@@ -243,22 +248,38 @@ class StatusBadge extends React.Component {
 
     render() {
         if(this.state.errorMessageEnabled) {
-            return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard}/></div>;
+            return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard} theme={this.props.theme} /></div>;
         } else {
-            return <div className="App"><Badge project={this.props.settings.project_name} workflow={this.props.settings.workflow_name} status={this.state.status} /></div>;
+            return <div className="App"><Badge project={this.props.settings.project_name} workflow={this.props.settings.workflow_name} status={this.state.status} theme={this.props.theme} /></div>;
         }
     }
 }
 
 class Badge extends React.Component {
     render() {
-        return <Tilt className="Tilt Tilt-status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
+        return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
+            <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
             <p className="status_badge_title">{this.props.project}</p>
             <p className="status_badge_subtitle">{this.props.workflow}</p>
             <div className={"Tilt-inner status_badge_wrapper status_" + this.props.status}>
-            <div className="status_badge_icon"><MaterialIcon icon={badgeIcons[this.props.status]} color="#FFF" /></div><p className="status_badge_text">{this.props.status}</p>
+            <div className="status_badge_icon"><StatusIcon status={this.props.status} /></div><p className="status_badge_text">{this.props.status}</p>
             </div>
-            </Tilt>;
+            </Tilt>
+            </div>;
+    }
+}
+
+class StatusIcon extends React.Component {
+    render() {
+        if(this.props.status === 'canceled') {
+            return <MaterialIcon icon='remove_circle_outline' color='#FFF' />;
+        } else if(this.props.status === 'failed') {
+            return <MaterialIcon icon='error_outline' color='#FFF' />;
+        } else if(this.props.status === 'success') {
+            return <MaterialIcon icon='check_circle_outline' color='#FFF' />;
+        } else {
+            return null;
+        }
     }
 }
 
