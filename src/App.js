@@ -223,13 +223,11 @@ class StatusBadge extends React.Component {
             monday.storage.instance.setItem('workflow_name', this.state.workflow_name);
         }
         if(this.state.project_name !== "" && Object.keys(this.props.projects).length > 0 && this.state.workflows === prevState.workflows) {
-            console.log("Getting workflows");
             this.get_workflows();
         }
     }
 
     get_workflows() {
-        console.log(this.props.projects);
         try {
             var workflow_list = [];
             var check_list = [];
@@ -241,13 +239,9 @@ class StatusBadge extends React.Component {
                     check_list.push(workflows[workflow]['name']);
                 }
             }
-            console.log(check_list);
-            console.log(workflow_list);
 
             this.setState({ workflows: workflow_list });
-        } catch(error) {
-            console.log(error);
-        }
+        } catch(error) {}
     }
 
     componentDidMount() {
@@ -287,7 +281,6 @@ class StatusBadge extends React.Component {
                 this.displayConfig(true, "project");
             }
         } else {
-            console.log(this.state.workflow_name);
             var workflow = project.find(workflow => workflow.name === this.state.workflow_name);
             if(workflow === undefined) {
                 if(!this.state.configEnabled || this.state.configType !== "workflow") {
@@ -333,7 +326,6 @@ class ProjectConfig extends React.Component {
 
 class WorkflowConfig extends React.Component {
     render() {
-        console.log(this.props.workflows);
         return <div>
             <p className="">Select your workflow</p>
             <div className="project_wrapper">
