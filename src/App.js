@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import MaterialIcon from 'material-icons-react';
 import Tilt from 'react-tilt';
+import Skeleton from 'react-loading-skeleton';
 import ReactCardFlip from 'react-card-flip';
 import mondaySdk from "monday-sdk-js";
 const monday = mondaySdk();
@@ -37,7 +38,8 @@ class App extends React.Component {
             workflow_name: "",
             errorFlipped: false,
             theme: "light",
-            edit_mode: false
+            edit_mode: false,
+            loading: true
         };
 
         this.flipCard = this.flipCard.bind(this);
@@ -45,12 +47,13 @@ class App extends React.Component {
         this.saveSelectedProject = this.saveSelectedProject.bind(this);
         this.selectWorkflow = this.selectWorkflow.bind(this);
         this.saveSelectedWorkflow = this.saveSelectedWorkflow.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
         this.displayMessage = this.displayMessage.bind(this);
     }
 
     componentDidMount() {
         monday.listen("settings", res => {
-            this.setState({settings: res.data});
+            this.setState({settings: res.data, loading: true});
         });
         monday.listen("context", res => {
             this.setState({theme: res.data.theme, edit_mode: res.data.editMode});
@@ -99,6 +102,13 @@ class App extends React.Component {
         } else {
             this.setState({errorMessageEnabled: enabled, errorMessage: message, errorExplanation: ""});
         }
+        if(!enabled) {
+            this.setState({ errorFlipped: false });
+        }
+    }
+
+    stopLoading() {
+        this.setState({ loading: false });
     }
 
     settingsComplete() {
@@ -136,6 +146,11 @@ class App extends React.Component {
                                 this.displayMessage(false);
                             } else {
                                 this.displayMessage(true, "no_results");
+                                if(!this.state.errorFlipped) {
+                                    setTimeout(() => {
+                                        this.setState({ errorFlipped: true });
+                                    }, 3000);
+                                }
                             }
                         }
                     })
@@ -172,7 +187,7 @@ class App extends React.Component {
         if(this.state.errorMessageEnabled) {
             return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard} theme={this.state.theme}/></div>;
         } else {
-            return <div className="app"><StatusBadge settings={this.state.settings} project_name={this.state.project_name} workflow_name={this.state.workflow_name} projects={this.state.projects} theme={this.state.theme} edit_mode={this.state.edit_mode} /></div>;
+            return <div className="app"><StatusBadge settings={this.state.settings} project_name={this.state.project_name} workflow_name={this.state.workflow_name} projects={this.state.projects} theme={this.state.theme} edit_mode={this.state.edit_mode} loading={this.state.loading} stopLoading={this.stopLoading} /></div>;
         }
     };
 }
@@ -257,7 +272,7 @@ class StatusBadge extends React.Component {
         });
     }
 
-    displayConfig(enabled, type="", save=false) {
+    displayConfig(enabled, type="") {
         this.setState({ configEnabled: enabled, configType: type });
         if(type === 'project') {
             this.setState({ project_name: "" });
@@ -285,6 +300,11 @@ class StatusBadge extends React.Component {
             if(workflow === undefined) {
                 if(!this.state.configEnabled || this.state.configType !== "workflow") {
                     this.displayConfig(true, "workflow");
+                    monday.storage.instance.getItem('workflow_name').then(res => {
+                        if(res.data.value !== null && res.data.value !== this.state.workflow_name) {
+                            this.setState({ workflow_name: res.data.value });
+                        }
+                    });
                 }
             } else {
                 if(this.state.configEnabled) {
@@ -292,18 +312,23 @@ class StatusBadge extends React.Component {
                 }
                 if(workflow !== undefined && this.state.status !== workflow.status) {
                     this.setState({ status: workflow.status });
+                    if(this.props.loading) {
+                        this.props.stopLoading();
+                    };
                 }
             }
         }
     }
 
     render() {
-        if(this.state.configEnabled && this.state.configType === "project") {
+        if(this.props.loading) {
+            return <div className="App"><Badge project={this.state.project_name} workflow={this.state.workflow_name} status={this.state.status} theme={this.props.theme} edit_mode={this.props.edit_mode} edit_project={() => this.displayConfig(true, "project")} edit_workflow={() => this.displayConfig(true, "workflow")} loading={this.props.loading} /></div>;
+        } else if(this.state.configEnabled && this.state.configType === "project") {
             return <div className="App"><ProjectConfig projects={this.props.projects} setProject={this.setProject} project_name={this.state.project_name} displayConfig={this.displayConfig} /></div>;
         } else if(this.state.configEnabled && this.state.configType === "workflow") {
             return <div className="App"><WorkflowConfig workflows={this.state.workflows} setWorkflow={this.setWorkflow} workflow_name={this.state.workflow_name} displayConfig={this.displayConfig} /></div>;
         } else {
-            return <div className="App"><Badge project={this.state.project_name} workflow={this.state.workflow_name} status={this.state.status} theme={this.props.theme} edit_mode={this.props.edit_mode} edit_project={() => this.displayConfig(true, "project")} edit_workflow={() => this.displayConfig(true, "workflow")} /></div>;
+            return <div className="App"><Badge project={this.state.project_name} workflow={this.state.workflow_name} status={this.state.status} theme={this.props.theme} edit_mode={this.props.edit_mode} edit_project={() => this.displayConfig(true, "project")} edit_workflow={() => this.displayConfig(true, "workflow")} loading={this.props.loading} /></div>;
         }
     }
 }
@@ -341,6 +366,7 @@ class WorkflowConfig extends React.Component {
 
 class Badge extends React.Component {
     render() {
+        if(!this.props.loading) {
         return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
             <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
             <p className="status_badge_title">{this.props.project.split("/").pop()} {this.props.edit_mode ? <MaterialIcon icon='edit' color='#000' onClick={this.props.edit_project} /> : ""}</p>
@@ -350,6 +376,16 @@ class Badge extends React.Component {
             </div>
             </Tilt>
             </div>;
+        } else {
+            return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
+                <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
+                <p className="status_badge_title"><Skeleton /></p>
+                <p className="status_badge_subtitle"><Skeleton /></p>
+                <Skeleton width={100} className="Tilt-inner status_badge_wrapper">
+                </Skeleton>
+                </Tilt>
+                </div>;
+        }
     }
 }
 

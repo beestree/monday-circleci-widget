@@ -20,6 +20,7 @@
     "react": "^16.13.0",
     "react-card-flip": "^1.0.11",
     "react-dom": "^16.13.0",
+    "react-loading-skeleton": "^2.1.1",
     "react-scripts": "3.4.0",
     "react-tilt": "^0.1.4"
   },
