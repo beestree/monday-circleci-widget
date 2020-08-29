@@ -263,7 +263,7 @@ body {
 /* Dark mode additions */
 
 .dark_mode .error_message_wrapper {
-    background-color: #121212;
+    background-color: #272727;
 }
 
 .dark_mode .error_message_title {
@@ -292,5 +292,9 @@ body {
 }
 
 .dark_mode .Tilt_status {
-    background-color: #121212;
+    background-color: #272727;
+}
+
+.dark_mode .welcome_message_wrapper {
+    background-color: #272727;
 }

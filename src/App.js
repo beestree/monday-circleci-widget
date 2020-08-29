@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import MaterialIcon from 'material-icons-react';
 import Tilt from 'react-tilt';
-import Skeleton from 'react-loading-skeleton';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import ReactCardFlip from 'react-card-flip';
 import mondaySdk from "monday-sdk-js";
 const monday = mondaySdk();
@@ -30,6 +30,8 @@ class App extends React.Component {
         this.state = {
             settings: {},
             name: "",
+            expected_results: 0,
+            fetched_results: 0,
             errorMessageEnabled: false,
             errorMessage: "",
             errorExplanation: "",
@@ -38,7 +40,7 @@ class App extends React.Component {
             project_name: "",
             workflow_name: "",
             errorFlipped: false,
-            theme: "light",
+            theme: "dark",
             edit_mode: false,
             loading: true
         };
@@ -56,16 +58,16 @@ class App extends React.Component {
         monday.listen("settings", res => {
             this.setState({settings: res.data, loading: true});
         });
-        monday.listen("context", res => {
-            this.setState({theme: res.data.theme, edit_mode: res.data.editMode});
-        });
-        //this.interval = setInterval(() => {
-        //    if(this.state.theme === "light") {
-        //        this.setState({ theme: "dark" });
-        //    } else {
-        //        this.setState({ theme: "light" });
-        //    }
-        //}, 1000);
+        //monday.listen("context", res => {
+        //    this.setState({theme: res.data.theme, edit_mode: res.data.editMode});
+        //});
+        this.interval = setInterval(() => {
+            if(this.state.theme === "light") {
+                this.setState({ theme: "dark" });
+            } else {
+                this.setState({ theme: "light" });
+            }
+        }, 3000);
     }
 
     flipCard(e) {
@@ -125,6 +127,9 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if((this.state.expected_results !== prevState.expected_results || this.state.fetched_results !== prevState.fetched_results) && this.state.expected_results === this.state.fetched_results) {
+            this.stopLoading();
+        }
         if(prevState.settings !== this.state.settings) {
             if(this.settingsComplete()) {
                 fetch("https://circleci.com/api/v2/pipeline?circle-token="+this.state.settings.circleci_api_token+"&org-slug="+this.state.settings.vcs_provider+"/"+this.state.settings.organization_name, {
@@ -144,7 +149,7 @@ class App extends React.Component {
                         } else {
                             if(data.items.length > 0) {
                                 var pipelines = data.items;
-                                this.setState({ projects: [] });
+                                this.setState({ expected_results: pipelines.length, projects: [] });
                                 for(var pipeline in pipelines) {
                                     this.getWorkflow(pipelines[pipeline]);
                                 }
@@ -183,7 +188,7 @@ class App extends React.Component {
                 for(var item in data.items) {
                     projects[pipeline.project_slug].push(data.items[item]);
                 }
-                this.setState({projects: projects});
+                this.setState({projects: projects, fetched_results: this.state.fetched_results + 1});
             })
             .catch(console.log);
     }
@@ -203,7 +208,7 @@ class App extends React.Component {
 
 class WelcomeMessage extends React.Component {
     render() {
-        return <Tilt options={{ max: 20 }}>
+        return <Tilt className={this.props.theme === "dark" ? "dark_mode" : ""} options={{ max: 20 }}>
             <div className="welcome_message_wrapper">
             <p className="welcome_title">CircleCI widget</p>
             <img className="circleci_logo" src="/circleci_logo.png" />
@@ -349,6 +354,8 @@ class StatusBadge extends React.Component {
             return <div className="App"><ProjectConfig projects={this.props.projects} setProject={this.setProject} project_name={this.state.project_name} displayConfig={this.displayConfig} /></div>;
         } else if(this.state.configEnabled && this.state.configType === "workflow") {
             return <div className="App"><WorkflowConfig workflows={this.state.workflows} setWorkflow={this.setWorkflow} workflow_name={this.state.workflow_name} displayConfig={this.displayConfig} /></div>;
+        } else if(this.props.loading) {
+                return <div className="App"><Badge project={this.state.project_name} workflow={this.state.workflow_name} status={this.state.status} theme={this.props.theme} edit_mode={this.props.edit_mode} edit_project={() => this.displayConfig(true, "project")} edit_workflow={() => this.displayConfig(true, "workflow")} loading={this.props.loading} /></div>;
         } else {
             return <div className="App"><Badge project={this.state.project_name} workflow={this.state.workflow_name} status={this.state.status} theme={this.props.theme} edit_mode={this.props.edit_mode} edit_project={() => this.displayConfig(true, "project")} edit_workflow={() => this.displayConfig(true, "workflow")} loading={this.props.loading} /></div>;
         }
@@ -388,23 +395,25 @@ class WorkflowConfig extends React.Component {
 
 class Badge extends React.Component {
     render() {
+        console.log(this.props.loading);
         if(!this.props.loading) {
-        return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
-            <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
-            <p className="status_badge_title">{this.props.project.split("/").pop()} {this.props.edit_mode ? <MaterialIcon icon='edit' color='#000' onClick={this.props.edit_project} /> : ""}</p>
-            <p className="status_badge_subtitle">{this.props.workflow} {this.props.edit_mode ? <MaterialIcon icon='edit' color='#000' onClick={this.props.edit_workflow} /> : ""}</p>
-            <div className={"Tilt-inner status_badge_wrapper status_" + this.props.status}>
-            <div className="status_badge_icon"><StatusIcon status={this.props.status} /></div><p className="status_badge_text">{this.props.status}</p>
-            </div>
-            </Tilt>
+            return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
+                <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
+                <p className="status_badge_title">{this.props.project.split("/").pop()} {this.props.edit_mode ? <MaterialIcon icon='edit' color='#000' onClick={this.props.edit_project} /> : ""}</p>
+                <p className="status_badge_subtitle">{this.props.workflow} {this.props.edit_mode ? <MaterialIcon icon='edit' color='#000' onClick={this.props.edit_workflow} /> : ""}</p>
+                <div className={"Tilt-inner status_badge_wrapper status_" + this.props.status}>
+                <div className="status_badge_icon"><StatusIcon status={this.props.status} /></div><p className="status_badge_text">{this.props.status}</p>
+                </div>
+                </Tilt>
             </div>;
         } else {
             return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
                 <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
+                <SkeletonTheme color={this.props.theme === "dark" ? "#444" : ""} highlightColor={this.props.theme === "dark" ? "#555" : ""}>
                 <p className="status_badge_title"><Skeleton /></p>
                 <p className="status_badge_subtitle"><Skeleton /></p>
-                <Skeleton width={100} className="Tilt-inner status_badge_wrapper">
-                </Skeleton>
+                <Skeleton width={100} className="Tilt-inner status_badge_wrapper" />
+                </SkeletonTheme>
                 </Tilt>
                 </div>;
         }
