@@ -395,7 +395,6 @@ class WorkflowConfig extends React.Component {
 
 class Badge extends React.Component {
     render() {
-        console.log(this.props.loading);
         if(!this.props.loading) {
             return <div className={this.props.theme === "dark" ? "dark_mode" : ""}>
                 <Tilt className="Tilt Tilt_status" options={{ max : 25 }} onMouseLeave={this.onMouseLeave}>
