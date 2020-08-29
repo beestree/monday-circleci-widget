@@ -58,7 +58,6 @@ body {
 .welcome_message_wrapper {
     overflow: hidden;
     position: relative;
-    background-color: #fff;
     border-radius: 2px;
     padding: 15px;
     width: 300px;
@@ -297,4 +296,13 @@ body {
 
 .dark_mode .welcome_message_wrapper {
     background-color: #272727;
+}
+
+.dark_mode .welcome_title {
+    color: white;
+    opacity: 87%;
+}
+.dark_mode .welcome_text {
+    color: white;
+    opacity: 87%;
 }

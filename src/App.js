@@ -40,7 +40,7 @@ class App extends React.Component {
             project_name: "",
             workflow_name: "",
             errorFlipped: false,
-            theme: "dark",
+            theme: "light",
             edit_mode: false,
             loading: true
         };
@@ -64,7 +64,7 @@ class App extends React.Component {
         this.interval = setInterval(() => {
             if(this.state.theme === "light") {
                 this.setState({ theme: "dark" });
-            } else {
+           } else {
                 this.setState({ theme: "light" });
             }
         }, 3000);
@@ -196,7 +196,7 @@ class App extends React.Component {
     render() {
         if(this.state.welcomeMessageEnabled){
             return <div className="App">
-                <WelcomeMessage />
+                <WelcomeMessage theme={this.state.theme} />
                 </div>;
         } else if(this.state.errorMessageEnabled) {
             return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard} theme={this.state.theme}/></div>;
@@ -211,8 +211,8 @@ class WelcomeMessage extends React.Component {
         return <Tilt className={this.props.theme === "dark" ? "dark_mode" : ""} options={{ max: 20 }}>
             <div className="welcome_message_wrapper">
             <p className="welcome_title">CircleCI widget</p>
-            <img className="circleci_logo" src="/circleci_logo.png" />
-            <img className="circleci_logo_second logo_animation" src="/circleci_logo.png" />
+            <img className="circleci_logo" src={"/circleci_logo" + (this.props.theme === "dark" ? "_dark" : "") + ".png"} />
+            <img className="circleci_logo_second logo_animation" src={"/circleci_logo" + (this.props.theme === "dark" ? "_dark" : "") + ".png"} />
             <p className="welcome_text">Fill in all fields to get started</p>
             </div>
             </Tilt>;
