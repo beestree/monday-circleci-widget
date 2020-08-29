@@ -12,7 +12,7 @@ const errorMessages = {
     unauthorized: {text: "You are unauthorized. Please enter a valid CircleCI API token.", explanation: "Go to CircleCI and log in. Then click on your profile on the bottom left and go to \"Personal API Tokens\". Create a new API Token and enter it here at \"CircleCI API token\" in the settings."},
     bad_request: {text: "Error 400: Bad request", explanation: ""},
     no_org_slug: {text: "Please enter your VCS provider. This can be GitHub or BitBucket", explanation: ""},
-    form_not_filled: {text: "Please fill in all fields", explanation: "Click the cog icon and fill in all fields to get started."},
+    form_not_filled: {text: "Please fill in all fields", explanation: "Fill in all required fields to get started with this widget."},
     no_results: {text: "The server returned no results.", explanation: "Did you fill in all values correctly? A possible reason for this error could be that you entered the wrong VCS provider."},
     workflow_not_found: {text: "This workflow could not be found. Please check the name.", explanation: ""},
     project_not_found: {text: "This project could not be found. Please check the name.", explanation: ""}
@@ -33,6 +33,7 @@ class App extends React.Component {
             errorMessageEnabled: false,
             errorMessage: "",
             errorExplanation: "",
+            welcomeMessageEnabled: false,
             projects: {},
             project_name: "",
             workflow_name: "",
@@ -97,13 +98,17 @@ class App extends React.Component {
     }
 
     displayMessage(enabled, message="default", from_list=true) {
-        if(from_list) {
-            this.setState({errorMessageEnabled: enabled, errorMessage: errorMessages[message]['text'], errorExplanation: errorMessages[message]['explanation']});
+        if(message === "welcome") {
+            this.setState({ welcomeMessageEnabled: enabled });
         } else {
-            this.setState({errorMessageEnabled: enabled, errorMessage: message, errorExplanation: ""});
+            if(from_list) {
+                this.setState({errorMessageEnabled: enabled, errorMessage: errorMessages[message]['text'], errorExplanation: errorMessages[message]['explanation']});
+            } else {
+                this.setState({errorMessageEnabled: enabled, errorMessage: message, errorExplanation: ""});
+            }
         }
         if(!enabled) {
-            this.setState({ errorFlipped: false });
+            this.setState({ errorFlipped: false, welcomeMessageEnabled: enabled });
         }
     }
 
@@ -156,7 +161,7 @@ class App extends React.Component {
                     })
                     .catch(console.log);
             } else {
-                this.displayMessage(true, "form_not_filled");
+                this.displayMessage(true, "welcome");
             }
         }
     }
@@ -184,12 +189,29 @@ class App extends React.Component {
     }
 
     render() {
-        if(this.state.errorMessageEnabled) {
+        if(this.state.welcomeMessageEnabled){
+            return <div className="App">
+                <WelcomeMessage />
+                </div>;
+        } else if(this.state.errorMessageEnabled) {
             return <div className="App"><ErrorMessage message={this.state.errorMessage} explanation={this.state.errorExplanation} errorFlipped={this.state.errorFlipped} flipCard={this.flipCard} theme={this.state.theme}/></div>;
         } else {
             return <div className="app"><StatusBadge settings={this.state.settings} project_name={this.state.project_name} workflow_name={this.state.workflow_name} projects={this.state.projects} theme={this.state.theme} edit_mode={this.state.edit_mode} loading={this.state.loading} stopLoading={this.stopLoading} /></div>;
         }
     };
+}
+
+class WelcomeMessage extends React.Component {
+    render() {
+        return <Tilt options={{ max: 20 }}>
+            <div className="welcome_message_wrapper">
+            <p className="welcome_title">CircleCI widget</p>
+            <img className="circleci_logo" src="/circleci_logo.png" />
+            <img className="circleci_logo_second logo_animation" src="/circleci_logo.png" />
+            <p className="welcome_text">Fill in all fields to get started</p>
+            </div>
+            </Tilt>;
+    }
 }
 
 class ErrorMessage extends React.Component {
