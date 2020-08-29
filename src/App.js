@@ -58,16 +58,16 @@ class App extends React.Component {
         monday.listen("settings", res => {
             this.setState({settings: res.data, loading: true});
         });
-        //monday.listen("context", res => {
-        //    this.setState({theme: res.data.theme, edit_mode: res.data.editMode});
-        //});
-        this.interval = setInterval(() => {
-            if(this.state.theme === "light") {
-                this.setState({ theme: "dark" });
-           } else {
-                this.setState({ theme: "light" });
-            }
-        }, 3000);
+        monday.listen("context", res => {
+            this.setState({theme: res.data.theme, edit_mode: res.data.editMode});
+        });
+        //this.interval = setInterval(() => {
+        //    if(this.state.theme === "light") {
+        //        this.setState({ theme: "dark" });
+        //   } else {
+        //        this.setState({ theme: "light" });
+        //    }
+        //}, 3000);
     }
 
     flipCard(e) {
