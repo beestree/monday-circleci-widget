@@ -267,27 +267,22 @@ body {
 
 .dark_mode .error_message_title {
     color: white;
-    opacity: 87%;
 }
 
 .dark_mode .error_message_message {
     color: white;
-    opacity: 87%;
 }
 
 .dark_mode .error_explanation {
     color: white;
-    opacity: 87%;
 }
 
 .dark_mode .status_badge_title {
     color: white;
-    opacity: 87%;
 }
 
 .dark_mode .status_badge_subtitle {
     color: white;
-    opacity: 87%;
 }
 
 .dark_mode .Tilt_status {
@@ -300,9 +295,7 @@ body {
 
 .dark_mode .welcome_title {
     color: white;
-    opacity: 87%;
 }
 .dark_mode .welcome_text {
     color: white;
-    opacity: 87%;
 }
